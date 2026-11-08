@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, ArrowDownUp, ArrowRight, Clock3, RefreshCw, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, Clock3, RefreshCw, ShieldCheck } from "lucide-react";
 import { findArbitrage, RateEdge } from "@/lib/arbitrage";
 
 type ApiData = { provider: string; currencies: string[]; rates: RateEdge[]; fetchedAt: string; rateDate?: string; pairCount: number; dataType?: string };
