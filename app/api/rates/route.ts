@@ -13,60 +13,58 @@ type FrankfurterRate = {
 
 export async function GET() {
   try {
-    // Frankfurter publishes reference rates daily and does not require an API key.
-    // Cache provider responses for one hour; a 60-second UI refresh cannot make
-    // daily reference rates more current.
-    const results = await Promise.all(
-      currencies.map(async (base) => {
-        const quotes = currencies.filter((currency) => currency !== base);
-        const url = new URL("https://api.frankfurter.dev/v2/rates");
-        url.searchParams.set("base", base);
-        url.searchParams.set("quotes", quotes.join(","));
+    // One provider request: EUR is the common reference base.
+    // Cross-rates are derived from the same dated reference snapshot.
+    const url = new URL("https://api.frankfurter.dev/v2/rates");
+    url.searchParams.set("base", "EUR");
+    url.searchParams.set("quotes", "USD,GBP,INR");
 
-        const response = await fetch(url.toString(), {
-          next: { revalidate: 3600 },
-        });
+    const response = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+    });
 
-        if (!response.ok) {
-          throw new Error(`Frankfurter request failed for ${base} (HTTP ${response.status}).`);
-        }
+    if (!response.ok) {
+      throw new Error(`Frankfurter request failed (HTTP ${response.status}).`);
+    }
 
-        return (await response.json()) as FrankfurterRate[];
-      })
-    );
+    const rows = (await response.json()) as FrankfurterRate[];
+    const referenceRates = new Map<string, number>([["EUR", 1]]);
 
-    const rows = results.flat();
-    const rates = rows
-      .filter(
-        (row) =>
-          currencies.includes(row.base) &&
-          currencies.includes(row.quote) &&
-          Number.isFinite(Number(row.rate)) &&
-          Number(row.rate) > 0
-      )
-      .map((row) => ({
-        from: row.base,
-        to: row.quote,
-        rate: Number(row.rate),
-      }));
+    for (const row of rows) {
+      if (
+        row.base === "EUR" &&
+        currencies.includes(row.quote) &&
+        Number.isFinite(Number(row.rate)) &&
+        Number(row.rate) > 0
+      ) {
+        referenceRates.set(row.quote, Number(row.rate));
+      }
+    }
 
-    if (rates.length !== currencies.length * (currencies.length - 1)) {
+    if (currencies.some((currency) => !referenceRates.has(currency))) {
       return NextResponse.json(
-        {
-          error:
-            "Frankfurter returned incomplete coverage for USD, EUR, GBP and INR. Try again later or check supported currencies.",
-        },
+        { error: "Frankfurter did not return all requested USD, EUR, GBP and INR reference rates." },
         { status: 502 }
       );
     }
 
-    const dates = rows.map((row) => row.date).filter(Boolean).sort();
+    const rateDate = rows[0]?.date;
+    const rates = currencies.flatMap((from) =>
+      currencies
+        .filter((to) => to !== from)
+        .map((to) => ({
+          from,
+          to,
+          rate: referenceRates.get(to)! / referenceRates.get(from)!,
+        }))
+    );
+
     return NextResponse.json({
       provider: "Frankfurter",
       currencies,
       rates,
       fetchedAt: new Date().toISOString(),
-      rateDate: dates[dates.length - 1],
+      rateDate,
       pairCount: rates.length / 2,
       dataType: "Daily reference rates",
     });
