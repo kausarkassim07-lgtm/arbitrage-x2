@@ -1,22 +1,136 @@
 "use client";
-import {useCallback,useEffect,useMemo,useState} from "react";
-import {Activity,ArrowDownUp,ArrowRight,Clock3,Cpu,Globe2,RefreshCw,ShieldAlert,Zap} from "lucide-react";
-import {findArbitrage,RateEdge} from "@/lib/arbitrage";
-type ApiData={provider:string;currencies:string[];rates:RateEdge[];fetchedAt:string;pairCount:number};
-export default function Home(){
- const [data,setData]=useState<ApiData|null>(null),[error,setError]=useState(""),[loading,setLoading]=useState(true),[fee,setFee]=useState(10),[count,setCount]=useState(60);
- const refresh=useCallback(async()=>{try{const r=await fetch("/api/rates",{cache:"no-store"});const j=await r.json();if(!r.ok)throw new Error(j.error||"Request failed");setData(j);setError("");}catch(e){setError(e instanceof Error?e.message:"Unknown error");}finally{setLoading(false);setCount(60);}},[]);
- useEffect(()=>{refresh();const a=setInterval(refresh,60000),b=setInterval(()=>setCount(v=>Math.max(0,v-1)),1000);return()=>{clearInterval(a);clearInterval(b)};},[refresh]);
- const result=useMemo(()=>data?findArbitrage(data.rates,data.currencies,fee):null,[data,fee]),best=result?.opportunities[0];
- const metrics=[{label:"CURRENCIES",value:data?String(data.currencies.length):"—",foot:"Configured currency universe",icon:<Globe2/>},{label:"DIRECT PAIRS",value:data?String(data.pairCount):"—",foot:"Independent provider quotes",icon:<ArrowDownUp/>},{label:"PROFITABLE CYCLES",value:result?String(result.opportunities.length):"—",foot:"After configured fee estimate",icon:<Zap/>},{label:"ALGORITHM",value:"O(V³)",foot:"Floyd–Warshall all-pairs scan",icon:<Cpu/>}];
- return <main className="min-h-screen grid-bg"><div className="mx-auto max-w-7xl px-5 py-7 md:px-8">
- <header className="flex flex-col gap-5 border-b border-slate-800 pb-6 md:flex-row md:items-center md:justify-between"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300"><ArrowDownUp size={23}/></div><div><div className="text-xl font-extrabold tracking-tight">ARBI<span className="text-cyan-300">SCAN</span></div><div className="text-[10px] tracking-[.22em] text-slate-500">CURRENCY INTELLIGENCE</div></div></div><div className="flex flex-wrap items-center gap-3 text-xs"><span className="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-2"><span className={"mr-2 inline-block h-2 w-2 rounded-full "+(data&&!error?"bg-emerald-400":"bg-amber-400")}/>{data&&!error?"DATA CONNECTED":"CONNECTING / DEMO NOT ACTIVE"}</span><span className="rounded-full border border-slate-700 px-3 py-2 text-slate-400">AUTO REFRESH · 60 SEC</span><button onClick={refresh} className="flex items-center gap-2 rounded-full bg-cyan-300 px-4 py-2 font-bold text-slate-950"><RefreshCw size={14}/> Refresh</button></div></header>
- <section className="py-9"><div className="mb-3 flex items-center gap-2 text-xs font-bold tracking-[.22em] text-cyan-300"><Activity size={15}/> LIVE MARKET MONITOR</div><div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end"><div><h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">Find the gap.<br/><span className="text-slate-500">Trace the cycle.</span></h1><p className="mt-4 max-w-xl text-sm leading-6 text-slate-400">Monitor currency conversion networks and scan for negative cycles using the Floyd–Warshall algorithm.</p></div><div className="panel flex min-w-56 items-center gap-3 p-4"><Clock3 className="text-cyan-300"/><div><div className="text-xs text-slate-500">NEXT REFRESH IN</div><div className="mono text-2xl">{String(count).padStart(2,"0")}s</div></div></div></div></section>
- {error&&<div className="mb-5 flex gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100"><ShieldAlert className="shrink-0 text-amber-300"/><div><b>Market data unavailable</b><p className="mt-1">{error}</p><p className="mt-2 text-xs text-amber-100/70">Frankfurter provides free daily reference rates and does not require an API key. Try again later if the provider is temporarily unavailable.</p></div></div>}
- <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(m=><div className="panel p-5" key={m.label}><div className="flex items-center justify-between text-xs font-bold tracking-widest text-slate-500"><span>{m.label}</span><span className="text-cyan-300">{m.icon}</span></div><div className="mono mt-4 text-3xl font-semibold">{m.value}</div><div className="mt-1 text-xs text-slate-500">{m.foot}</div></div>)}</section>
- <section className="mt-5 grid gap-5 lg:grid-cols-[1.4fr_.8fr]"><div className="panel overflow-hidden"><div className="flex items-center justify-between border-b border-slate-800 px-5 py-4"><div><h2 className="font-bold">Arbitrage opportunities</h2><p className="mt-1 text-xs text-slate-500">Ranked by estimated net return per cycle</p></div><span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">LIVE SCAN</span></div>{loading?<div className="p-12 text-center text-sm text-slate-500">Connecting to market data…</div>:!best?<div className="p-12 text-center"><div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 text-slate-500"><Activity/></div><b>{data?"No profitable cycles detected":"Waiting for market data"}</b><p className="mt-2 text-xs text-slate-500">The scanner checks cycles after each successful update.</p></div>:<div className="divide-y divide-slate-800">{result!.opportunities.map((op,i)=><div key={op.path.join(">")} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><div className="mb-2 flex items-center gap-2"><span className="rounded bg-cyan-400/10 px-2 py-1 text-[10px] font-bold text-cyan-300">CYCLE {i+1}</span><span className="text-xs text-slate-500">{op.length} legs</span></div><div className="mono flex flex-wrap items-center gap-2 text-sm">{op.path.map((p,j)=><span key={j} className="flex items-center gap-2">{p}{j<op.path.length-1&&<ArrowRight size={13} className="text-slate-600"/>}</span>)}</div></div><div className="sm:text-right"><div className="mono text-xl font-bold text-emerald-300">+{op.grossPercent.toFixed(4)}%</div><div className="text-[11px] text-slate-500">estimated return</div></div></div>)}</div>}</div>
- <aside className="panel p-5"><h2 className="font-bold">Scanner configuration</h2><p className="mt-1 text-xs text-slate-500">Estimated fee applied to every conversion leg.</p><div className="mt-7 flex justify-between text-sm"><label htmlFor="fee" className="text-slate-400">Estimated fee per leg</label><span className="mono text-cyan-300">{(fee/100).toFixed(2)}%</span></div><input id="fee" type="range" min="0" max="50" value={fee} onChange={e=>setFee(Number(e.target.value))} className="mt-4 w-full accent-cyan-300"/><div className="mt-2 flex justify-between text-[10px] text-slate-600"><span>0.00%</span><span>0.50%</span></div><div className="mt-7 rounded-xl bg-slate-950/70 p-4"><div className="text-xs text-slate-500">BEST DETECTED RETURN</div><div className="mono mt-2 text-3xl font-bold">{best?"+"+best.grossPercent.toFixed(4)+"%":"—"}</div><div className="mt-1 text-xs text-slate-500">{best?best.length+" conversion legs · "+best.path.join(" → "):"No cycle currently qualifies"}</div></div><div className="mt-5 space-y-3 text-xs text-slate-400"><div className="flex justify-between"><span>Data source</span><span className="text-slate-200">{data?.provider||"Frankfurter"}</span></div><div className="flex justify-between"><span>Refresh interval</span><span className="text-slate-200">60 seconds</span></div><div className="flex justify-between"><span>Cycles shown</span><span className="text-slate-200">Up to 30</span></div></div></aside></section>
- <section className="panel mt-5 overflow-hidden"><div className="border-b border-slate-800 px-5 py-4"><h2 className="font-bold">Currency rate matrix</h2><p className="mt-1 text-xs text-slate-500">Indicative provider rates with reciprocal reverse edges, not executable bid/ask quotes.</p></div>{data?<div className="overflow-x-auto"><table className="w-full min-w-[650px] text-sm"><thead><tr className="text-left text-xs text-slate-500">{["PAIR","RATE","INVERSE","SOURCE"].map(x=><th key={x} className="px-5 py-3">{x}</th>)}</tr></thead><tbody>{data.rates.filter(r=>r.from<r.to).map(r=><tr key={r.from+r.to} className="border-t border-slate-800/80"><td className="mono px-5 py-3 font-semibold">{r.from}/{r.to}</td><td className="mono px-5 py-3">{r.rate.toLocaleString("en-US",{maximumFractionDigits:6})}</td><td className="mono px-5 py-3 text-slate-400">{(1/r.rate).toLocaleString("en-US",{maximumFractionDigits:6})}</td><td className="px-5 py-3 text-xs text-cyan-300">Frankfurter</td></tr>)}</tbody></table></div>:<div className="p-8 text-center text-sm text-slate-500">Rates appear after the API connection succeeds.</div>}</section>
- <footer className="flex flex-col gap-3 py-8 text-[11px] leading-5 text-slate-600 md:flex-row md:justify-between"><span>ARBISCAN · Educational market-data analysis · Not investment advice</span><span>Spreads, fees, latency and execution may differ. No live trade is placed by this application.</span></footer>
- </div></main>;
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Activity, ArrowDownUp, ArrowRight, Clock3, RefreshCw, ShieldCheck, Zap } from "lucide-react";
+import { findArbitrage, RateEdge } from "@/lib/arbitrage";
+
+type ApiData = { provider: string; currencies: string[]; rates: RateEdge[]; fetchedAt: string; rateDate?: string; pairCount: number; dataType?: string };
+
+export default function Home() {
+  const [data, setData] = useState<ApiData | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [fee, setFee] = useState(10);
+  const [seconds, setSeconds] = useState(60);
+  const [amount, setAmount] = useState("1000");
+  const [start, setStart] = useState("USD");
+
+  const refresh = useCallback(async () => {
+    try {
+      const response = await fetch("/api/rates", { cache: "no-store" });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.error || "Could not load reference rates.");
+      setData(json); setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Market data unavailable.");
+    } finally { setLoading(false); setSeconds(60); }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+    const refreshTimer = setInterval(refresh, 60000);
+    const countdown = setInterval(() => setSeconds(v => Math.max(0, v - 1)), 1000);
+    return () => { clearInterval(refreshTimer); clearInterval(countdown); };
+  }, [refresh]);
+
+  const scan = useMemo(() => data ? findArbitrage(data.rates, data.currencies, fee) : null, [data, fee]);
+  const best = scan?.opportunities[0];
+  const routeRates = useMemo(() => {
+    if (!data) return [];
+    return data.rates.filter(r => r.from < r.to);
+  }, [data]);
+  const rateMap = useMemo(() => new Map(data?.rates.map(r => [r.from + "|" + r.to, r.rate]) || []), [data]);
+  const routeForStart = useMemo(() => {
+    if (!data) return null;
+    const edges = data.rates.filter(r => r.from === start);
+    const first = edges.map(edge => {
+      const second = data.rates.filter(r => r.from === edge.to && r.to !== start);
+      return second.map(mid => {
+        const closing = rateMap.get(mid.to + "|" + start);
+        return closing ? { path: [start, edge.to, mid.to, start], product: edge.rate * mid.rate * closing } : null;
+      }).filter(Boolean);
+    }).flat().filter(Boolean) as {path:string[];product:number}[];
+    return first.sort((a,b)=>b.product-a.product)[0] || null;
+  }, [data, start, rateMap]);
+  const fmt = (value: number, currency: string) => new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 2 }).format(value);
+  const fmtRate = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 6 });
+
+  return <main className="min-h-screen bg-[#f3f2ec] text-[#0c2a21]">
+    <header className="sticky top-0 z-30 border-b border-[#0c2a21]/10 bg-[#f3f2ec]/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5">
+        <a href="#top" className="flex items-center gap-2 text-xl font-extrabold"><span className="grid h-8 w-8 place-items-center rounded-lg bg-[#0b2e24] text-[#d6ff3d]">⚡</span>Arbitrage X</a>
+        <nav className="hidden items-center gap-7 text-sm font-bold text-[#566860] md:flex"><a href="#how">How it works</a><a href="#try">Try a route</a><a href="#markets">Markets</a><a href="#try" className="rounded-full bg-[#d6ff3d] px-5 py-3 text-[#0b2e24]">Open the app</a></nav>
+        <a href="#try" className="rounded-full bg-[#d6ff3d] px-4 py-2 text-sm font-extrabold md:hidden">Explore</a>
+      </div>
+    </header>
+
+    <section id="top" className="relative overflow-hidden rounded-b-[36px] bg-[#0b2e24] text-[#eef3ea]">
+      <div className="pointer-events-none absolute -right-28 -top-32 h-[550px] w-[550px] rounded-full bg-[#d6ff3d]/20 blur-[100px]"/>
+      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-[1.1fr_.9fr] md:py-24">
+        <div><span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-bold"><i className="h-2 w-2 rounded-full bg-[#d6ff3d]"/> DAILY REFERENCE-RATE SCANNER</span>
+          <h1 className="mt-7 text-5xl font-extrabold leading-[1.02] tracking-[-.05em] md:text-7xl">Spot the gap.<br/><span className="text-[#d6ff3d]">Trace the cycle.</span></h1>
+          <p className="mt-6 max-w-lg text-lg leading-8 text-white/70">Explore currency conversion networks and detect theoretical arbitrage cycles with the Floyd–Warshall algorithm.</p>
+          <div className="mt-8 flex flex-wrap gap-3"><a href="#try" className="rounded-full bg-[#d6ff3d] px-6 py-3 font-extrabold text-[#0b2e24]">Find a route <ArrowRight className="ml-2 inline" size={17}/></a><a href="#how" className="rounded-full border border-white/40 px-6 py-3 font-bold">See how it works</a></div>
+          <p className="mt-5 text-xs text-white/50">Educational analysis · Not live trading quotes or financial advice</p>
+        </div>
+        <div className="relative mx-auto w-full max-w-sm">
+          <div className="rounded-[38px] bg-[#050d0a] p-3 shadow-2xl shadow-black/40">
+            <div className="min-h-[440px] rounded-[29px] bg-gradient-to-b from-[#14503d] to-[#0a241d] p-6 text-white">
+              <div className="flex items-center justify-between text-sm font-extrabold"><span>Opportunity scanner</span><span className="rounded-full bg-[#d6ff3d]/15 px-3 py-1 text-xs text-[#d6ff3d]">{data ? "CONNECTED" : "SCANNING"}</span></div>
+              <div className="mt-7 rounded-3xl bg-[#d6ff3d] p-5 text-[#0b2e24]"><div className="text-xs font-bold opacity-60">BEST DETECTED CYCLE</div><div className="mt-3 text-sm font-extrabold">{best ? best.path.join(" → ") : "No qualifying cycle"}</div><div className="mt-4 text-4xl font-extrabold">{best ? (best.grossPercent >= 0 ? "+" : "") + best.grossPercent.toFixed(4) + "%" : "—"}</div><div className="mt-1 text-xs opacity-60">Estimated after fee setting</div></div>
+              <div className="mt-5 space-y-3">{(scan?.opportunities.slice(1,4) || []).map((op,i)=><div key={op.path.join("-")} className="flex items-center justify-between rounded-2xl bg-white/10 p-4 text-xs font-bold"><span>{op.path.join(" → ")}</span><span className="text-[#d6ff3d]">+{op.grossPercent.toFixed(3)}%</span></div>)}
+                {!best && <div className="rounded-2xl bg-white/10 p-4 text-sm text-white/65">{loading ? "Loading reference rates…" : "No theoretical positive cycle found at the current fee setting."}</div>}
+              </div>
+              <div className="mt-7 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full w-2/5 rounded-full bg-[#d6ff3d]"/></div>
+              <div className="mt-3 text-[10px] text-white/50">Frankfurter daily reference rates · {data?.rateDate || "Waiting for data"}</div>
+            </div>
+          </div>
+          <div className="absolute -left-5 top-20 rounded-2xl bg-white px-4 py-3 text-xs font-extrabold text-[#0c2a21] shadow-xl">USD / EUR <span className="ml-2 text-[#1a7f4b]">↗</span></div>
+          <div className="absolute -right-3 bottom-14 rounded-2xl bg-white px-4 py-3 text-xs font-extrabold text-[#0c2a21] shadow-xl">Floyd–Warshall</div>
+        </div>
+      </div>
+    </section>
+
+    <div className="border-b border-[#0c2a21]/10 py-5"><div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-10 gap-y-3 px-5 text-sm font-extrabold text-[#566860]"><span>USD / EUR</span><span>GBP / INR</span><span>EUR / GBP</span><span>USD / INR</span><span>DAILY REFERENCE DATA</span></div></div>
+
+    <section id="how" className="mx-auto max-w-6xl px-5 py-20">
+      <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">Clear routes.<br/>No guesswork.</h2><p className="mt-4 max-w-xl text-lg text-[#566860]">A simple view of how a currency network can be checked for profitable-looking loops.</p>
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        {[["01","Watch the rates","Load a consistent daily reference-rate snapshot from Frankfurter."],["02","Find the cycle","Floyd–Warshall checks the currency graph for negative-log cycles."],["03","Review the result","Inspect each conversion leg and compare the theoretical return after estimated fees."]].map(([n,title,desc])=><article key={n} className="rounded-[26px] border border-[#0c2a21]/10 bg-white p-7"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0b2e24] font-extrabold text-[#d6ff3d]">{n}</div><h3 className="mt-6 text-xl font-extrabold">{title}</h3><p className="mt-2 leading-7 text-[#566860]">{desc}</p></article>)}
+      </div>
+    </section>
+
+    <section id="try" className="mx-3 rounded-[34px] bg-[#0b2e24] py-16 text-white md:mx-5">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2">
+        <div><h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">Try a route.</h2><p className="mt-4 max-w-lg text-lg leading-8 text-white/65">Choose a starting currency and amount to trace a three-leg round trip using the latest available reference rates.</p>
+          <div className="mt-8 flex items-center gap-3 text-sm text-white/70"><Clock3 className="text-[#d6ff3d]"/> Dashboard refreshes every 60 seconds</div>
+        </div>
+        <div className="rounded-[30px] bg-[#102f25] p-6 shadow-xl">
+          <div className="flex items-center justify-between"><b className="text-lg">Find my route</b><span className="rounded-full bg-[#d6ff3d]/15 px-3 py-1 text-xs font-bold text-[#d6ff3d]">REFERENCE DATA</span></div>
+          <label className="mt-7 block text-xs font-extrabold uppercase tracking-widest text-white/50" htmlFor="amount">Starting amount</label>
+          <input id="amount" type="number" min="1" value={amount} onChange={e=>setAmount(e.target.value)} className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-lg font-bold text-white outline-none focus:border-[#d6ff3d]"/>
+          <label className="mt-5 block text-xs font-extrabold uppercase tracking-widest text-white/50" htmlFor="start">Start currency</label>
+          <select id="start" value={start} onChange={e=>setStart(e.target.value)} className="mt-2 w-full rounded-xl border border-white/15 bg-[#102f25] px-4 py-3 font-bold text-white">{(data?.currencies || ["USD","EUR","GBP","INR"]).map(c=><option key={c}>{c}</option>)}</select>
+          <div className="mt-6 rounded-2xl bg-white/5 p-4">
+            {routeForStart && data ? <><div className="text-xs font-bold text-[#d6ff3d]">BEST THREE-LEG ROUTE</div><div className="mt-2 text-sm font-extrabold">{routeForStart.path.join(" → ")}</div><div className="mt-3 text-2xl font-extrabold">{fmt(Number(amount||0)*routeForStart.product,start)}</div><div className="mt-1 text-xs text-white/50">Theoretical final amount before fees and execution costs</div></> : <div className="text-sm text-white/60">{loading ? "Loading reference rates…" : "No route available for this currency."}</div>}
+          </div>
+          <p className="mt-4 text-xs leading-5 text-white/40">This calculator uses indicative daily rates and does not represent an executable trade.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="markets" className="mx-auto max-w-6xl px-5 py-20">
+      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><h2 className="text-4xl font-extrabold md:text-5xl">Markets.</h2><p className="mt-3 text-[#566860]">Four currencies, six unique pairs, one consistent reference snapshot.</p></div>
+        <button onClick={refresh} className="inline-flex items-center gap-2 self-start rounded-full bg-[#d6ff3d] px-5 py-3 font-extrabold text-[#0b2e24]"><RefreshCw size={16}/> Refresh rates</button></div>
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{(data?.currencies || ["USD","EUR","GBP","INR"]).map((c,i)=><div key={c} className="rounded-3xl border border-[#0c2a21]/10 bg-white p-6"><div className="text-xs font-extrabold text-[#1a7f4b]">CURRENCY {String(i+1).padStart(2,"0")}</div><div className="mt-3 text-3xl font-extrabold">{c}</div><div className="mt-1 text-sm text-[#566860]">{({USD:"US Dollar",EUR:"Euro",GBP:"British Pound",INR:"Indian Rupee"} as Record<string,string>)[c] || c}</div></div>)}</div>
+      <div className="mt-8 overflow-hidden rounded-3xl border border-[#0c2a21]/10 bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#0c2a21]/10 p-5"><div><h3 className="font-extrabold">Currency rate matrix</h3><p className="mt-1 text-xs text-[#566860]">Indicative cross-rates derived from one EUR reference snapshot.</p></div><span className="rounded-full bg-[#d6ff3d]/40 px-3 py-2 text-xs font-extrabold text-[#0b2e24]">{data?.provider || "Frankfurter"}</span></div>
+        {data ? <div className="overflow-x-auto"><table className="w-full min-w-[520px] text-left text-sm"><thead className="text-xs text-[#566860]"><tr>{["PAIR","REFERENCE RATE","INVERSE"].map(x=><th key={x} className="px-5 py-4">{x}</th>)}</tr></thead><tbody>{routeRates.map(r=><tr key={r.from+r.to} className="border-t border-[#0c2a21]/10"><td className="px-5 py-4 font-extrabold">{r.from}/{r.to}</td><td className="px-5 py-4 tabular-nums">{fmtRate(r.rate)}</td><td className="px-5 py-4 tabular-nums text-[#566860]">{fmtRate(1/r.rate)}</td></tr>)}</tbody></table></div> : <div className="p-8 text-sm text-[#566860]">{error || "Connecting to Frankfurter…"}</div>}
+      </div>
+    </section>
+
+    <footer className="rounded-t-[34px] bg-[#0b2e24] px-5 py-12 text-white/60"><div className="mx-auto flex max-w-6xl flex-col justify-between gap-5 md:flex-row"><div><div className="text-xl font-extrabold text-white">⚡ Arbitrage X</div><p className="mt-2 max-w-xl text-sm leading-6">A student project exploring currency arbitrage detection with Floyd–Warshall. Reference rates are daily and are not executable bid/ask quotes.</p></div><div className="text-xs md:text-right"><div className="font-bold text-white/80">DATA SOURCE · {data?.provider || "FRANKFURTER"}</div><div className="mt-2">Rate date: {data?.rateDate || "Not loaded"} · Next refresh: {seconds}s</div><div className="mt-2">© 2026 Arbitrage X · Educational use only</div></div></div></footer>
+    {error && <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 shadow-xl"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 shrink-0"/><div><b>Market data unavailable</b><p className="mt-1">{error}</p></div></div></div>}
+    <div className="sr-only" aria-live="polite">{data ? "Frankfurter connected" : loading ? "Loading market data" : "Market data unavailable"}</div>
+  </main>;
 }
