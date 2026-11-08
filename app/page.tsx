@@ -17,6 +17,7 @@ export default function Home() {
   const [start, setStart] = useState("USD");
 
   const refresh = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/rates", { cache: "no-store" });
       const json = await response.json();
