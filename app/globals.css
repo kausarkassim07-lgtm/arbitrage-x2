@@ -24,8 +24,8 @@ input:focus, select:focus { box-shadow: 0 0 0 3px rgba(214,255,61,.2); }
 ::selection { background: #d6ff3d; color: #0b2e24; }
 @keyframes soft-float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-9px) rotate(1deg); } }
 @keyframes soft-glow { 0%,100% { box-shadow: 0 0 0 rgba(214,255,61,0); } 50% { box-shadow: 0 0 32px rgba(214,255,61,.16); } }
-#top .relative.mx-auto > div:last-child { animation: soft-float 6s ease-in-out infinite; }
-#top .relative.mx-auto > div:last-child > div:first-child > div { animation: soft-glow 4s ease-in-out infinite; }
+#top .relative.mx-auto > div:first-child { animation: soft-float 6s ease-in-out infinite; }
+#top .relative.mx-auto > div:first-child > div > div:nth-child(2) { animation: soft-glow 4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
