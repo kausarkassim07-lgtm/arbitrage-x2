@@ -17,3 +17,9 @@ A Next.js dashboard that scans currency conversion cycles using negative-log edg
 
 ## Local development
 Run npm install, copy .env.example to .env.local, add your API key, then run npm run dev.
+
+
+## API usage optimization
+- The dashboard uses USD, EUR, GBP and INR (six requested currency pairs).
+- The browser refreshes market data every 60 seconds to reduce provider API usage.
+- Provider quotas and billing rules vary by plan; verify the current Twelve Data allowance before relying on this estimate.
