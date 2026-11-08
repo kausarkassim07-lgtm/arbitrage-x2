@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #080b12; color: #e8edf6; font-family: Manrope, sans-serif; }
+.mono { font-family: 'DM Mono', monospace; }
+.panel { background: linear-gradient(145deg,rgba(20,27,42,.96),rgba(12,17,28,.96)); border: 1px solid #222c40; border-radius: 18px; }
+.grid-bg { background-image: linear-gradient(rgba(91,111,145,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(91,111,145,.07) 1px,transparent 1px); background-size: 34px 34px; }
