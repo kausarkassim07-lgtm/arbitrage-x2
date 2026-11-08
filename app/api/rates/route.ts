@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
-const currencies=["USD","EUR","GBP","JPY","CHF","CAD","AUD","INR"];
+const currencies=["USD","EUR","GBP","INR"];
 const pairs=currencies.flatMap((a,i)=>currencies.slice(i+1).map(b=>a+"/"+b));
 export async function GET(){
  const key=process.env.TWELVE_DATA_API_KEY;
