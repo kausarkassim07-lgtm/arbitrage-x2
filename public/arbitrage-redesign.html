@@ -95,6 +95,29 @@ footer .logo{color:#eef3ea}footer p{max-width:420px;margin:10px 0 0}
 .js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s,transform .8s}.js .rv.in{opacity:1;transform:none}
 @media(max-width:860px){nav a:not(.btn){display:none}.hero .w,.try .w{grid-template-columns:1fr}.stats,.steps{grid-template-columns:1fr}.stage{min-height:0;padding-top:20px}.c1{left:0}.c2{right:0}section{padding:64px 0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+ 
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-top:64px}
+.how-grid h3,.fw-demo h3{font-size:30px;letter-spacing:-.03em;margin:0 0 18px}
+.how-grid p{font-size:18px;color:var(--mut);line-height:1.7;margin:0 0 22px}
+.how-grid strong{font-size:17px}
+.currency-graph{display:grid;place-items:center;min-height:300px}
+.currency-graph svg{width:min(100%,420px);height:auto;overflow:visible}
+.fw-demo{margin-top:72px;border-top:1px solid var(--line);padding-top:40px}
+.fw-demo .sub{max-width:660px;line-height:1.7}
+.fw-controls{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}
+.fw-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:12px 20px;font:800 15px Manrope,system-ui,sans-serif;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.fw-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(12,42,33,.1)}
+.fw-explain{font-size:16px;line-height:1.6;max-width:700px;margin:28px 0 20px}
+.fw-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:26px;background:var(--card)}
+.fw-table{border-collapse:collapse;width:100%;min-width:560px;text-align:center;font-variant-numeric:tabular-nums}
+.fw-table th,.fw-table td{padding:18px 20px;border-bottom:1px solid var(--line)}
+.fw-table th{font-size:13px;color:var(--mut);font-weight:800}
+.fw-table td:first-child{text-align:left;font-weight:800}
+.fw-table tr:last-child td{border-bottom:0}
+.fw-table td.changed{background:rgba(214,255,61,.18);font-weight:800}
+.fw-table td.negative{color:var(--up);font-weight:800}
+.fw-status{font-size:13px;color:var(--mut);margin-top:14px}
+@media(max-width:860px){.how-grid{grid-template-columns:1fr;gap:24px}.fw-demo{margin-top:48px}.how-grid h3,.fw-demo h3{font-size:25px}}
 </style>
 </head>
 <body>
@@ -117,23 +140,31 @@ footer .logo{color:#eef3ea}footer p{max-width:420px;margin:10px 0 0}
 <div class="tick"><div id="tk"></div></div>
 
 <section id="how"><div class="w">
-<h2 class="rv">Clear routes.<br>No guesswork.</h2><p class="sub rv">Everything you need to see a gap, in plain numbers.</p>
-<div class="stats rv"><div class="stat"><b data-n="0" id="s1">0</b><span>Currencies tracked</span></div><div class="stat"><b data-n="0" id="s2">0</b><span>Routes watched at once</span></div><div class="stat"><b>2s</b><span>Between refreshes</span></div></div>
-<div class="steps">
-<div class="step rv"><i>1</i><h3>We watch the rates</h3><p>Every pair is checked continuously, so nothing slips past while you’re away.</p></div>
-<div class="step rv"><i>2</i><h3>We find the gap</h3><p>When a round trip through a few currencies ends with more than you started, it appears instantly.</p></div>
-<div class="step rv"><i>3</i><h3>You follow the route</h3><p>See each step, each amount and your final result before you decide anything.</p></div>
+<h2 class="rv">How it works.</h2>
+<p class="sub rv">The idea is simple. If a trip through a few currencies brings you back with more than you started with, that gap is an opportunity.</p>
+<div class="how-grid rv">
+<div><h3>The big idea</h3><p>Swap money from one currency into another, and keep going until you are back where you began. Normally you end up with a little less. But when rates drift out of line, you can end up with more, and that extra is the opportunity.</p><strong>Following 1,000 USD once around the loop.</strong></div>
+<div class="currency-graph" aria-label="Currency exchange loop diagram">
+<svg viewBox="0 0 420 300" role="img" aria-label="USD to EUR to GBP and back to USD">
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#9aa8a0"/></marker></defs>
+<path d="M198 68 L105 205" stroke="#9aa8a0" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M130 224 L290 224" stroke="#9aa8a0" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+<path d="M315 205 L222 68" stroke="#9aa8a0" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+<circle cx="210" cy="48" r="36" fill="white" stroke="#0c2a21" stroke-width="1.5"/><text x="210" y="54" text-anchor="middle" font-size="16" font-weight="800" fill="#0c2a21">USD</text>
+<circle cx="92" cy="224" r="36" fill="white" stroke="#0c2a21" stroke-width="1.5"/><text x="92" y="230" text-anchor="middle" font-size="16" font-weight="800" fill="#0c2a21">EUR</text>
+<circle cx="328" cy="224" r="36" fill="white" stroke="#0c2a21" stroke-width="1.5"/><text x="328" y="230" text-anchor="middle" font-size="16" font-weight="800" fill="#0c2a21">GBP</text>
+<circle cx="328" cy="224" r="12" fill="#d6ff3d" stroke="#0c2a21" stroke-width="2"/>
+</svg></div>
 </div>
-<div class="algorithm rv">
-<h2>Inside the algorithm.</h2>
-<p class="sub">Arbitrage X uses the Floyd–Warshall algorithm to analyse exchange-rate paths and detect potential currency loops.</p>
-<div class="steps">
-<div class="step"><i>1</i><h3>Build the currency graph</h3><p>Each currency is a node. An exchange rate from one currency to another becomes a directed edge, weighted using the negative logarithm: −ln(rate).</p></div>
-<div class="step"><i>2</i><h3>Compare every path</h3><p>Floyd–Warshall checks paths through every intermediate currency and keeps the lowest-cost route between each pair.</p></div>
-<div class="step"><i>3</i><h3>Detect a negative cycle</h3><p>If a diagonal distance becomes negative, a cycle may produce more currency than it started with. The route is then checked by multiplying its exchange rates.</p></div>
+<div class="fw-demo rv">
+<h3>Watch the search happen</h3>
+<p class="sub">The Floyd–Warshall method checks every currency in turn as a possible stepping stone. Each cell shows the best score for going from the row currency to the column currency. Press Next step and watch the numbers improve. If any cell on the diagonal ends up negative, a money-making loop may exist.</p>
+<div class="fw-controls"><button class="fw-btn" id="fwNext" type="button">Next step</button><button class="fw-btn" id="fwAuto" type="button">Auto-play</button><button class="fw-btn" id="fwReset" type="button">Reset with latest rates</button></div>
+<p class="fw-explain" id="fwExplain">Each cell is the score of going straight from the row currency to the column currency. Lower is better. Press Next step.</p>
+<div class="fw-table-wrap"><table class="fw-table" id="fwTable"><thead><tr><th>FROM / TO</th><th>USD</th><th>EUR</th><th>INR</th><th>GBP</th></tr></thead><tbody></tbody></table></div>
+<p class="fw-status" id="fwStatus">Waiting for daily reference rates…</p>
 </div>
-<p class="sub" style="margin-top:22px;font-size:14px">A detected cycle is only a theoretical opportunity based on reference rates. Real execution can be affected by fees, spreads, slippage and rate delays.</p>
-</div></div></section>
+</div></section>
 
 <section class="try" id="try"><div class="w">
 <div class="rv"><h2>Try a route.</h2><p class="sub">Pick a starting currency and an amount. We’ll show the best round trip available at this moment, step by step.</p></div>
@@ -188,6 +219,7 @@ async function loadRates(){
   const nextRates=new Map(data.rates.map(r=>[`${r.from}-${r.to}`,Number(r.rate)]).filter(([,v])=>Number.isFinite(v)&&v>0));
   if(CUR.some(a=>CUR.some(b=>a!==b&&!nextRates.has(`${a.c}-${b.c}`))))throw new Error('Frankfurter did not return every currency pair');
   liveRates=nextRates;rateDate=data.rateDate||'';ratesLoaded=true;
+  if(fwStep===0)fwReset();
  }catch(error){console.error('Unable to load Frankfurter rates:',error);if(!ratesLoaded){$('hSub').textContent='Daily rates are temporarily unavailable';$('mg').querySelectorAll('[data-market-value]').forEach(e=>e.textContent='Rate unavailable')}}
  render();
 }
@@ -213,6 +245,43 @@ if('IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.for
 const stg=$('stage'),ph=$('ph');
 stg.addEventListener('pointermove',e=>{const r=stg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ph.style.transform=`rotateY(${x*18}deg) rotateX(${-y*12}deg)`});
 stg.addEventListener('pointerleave',()=>ph.style.transform='');
+
+let fwState=null,fwStep=0,fwTimer=null;
+const fwNames=CUR.map(x=>x.c);
+function fwInitial(){
+ const n=CUR.length,dist=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>i===j?0:(liveRates.has(`${CUR[i].c}-${CUR[j].c}`)?-Math.log(rate(i,j)):Infinity)));
+ return dist;
+}
+function fwRender(changed=[]){
+ const body=$('fwTable').querySelector('tbody');
+ body.innerHTML=fwState.map((row,i)=>'<tr><td>'+fwNames[i]+'</td>'+row.map((v,j)=>'<td class="'+(changed.includes(i+','+j)?'changed ':'')+(i===j&&v<0?'negative':'')+'">'+(Number.isFinite(v)?v.toFixed(3):'—')+'</td>').join('')+'</tr>').join('');
+ const labels=['USD','EUR','INR','GBP'];
+ $('fwExplain').textContent=fwStep===0?'Each cell is the score of going straight from the row currency to the column currency. Lower is better. Press Next step.':`Step ${fwStep}: checking ${labels[fwStep-1]} as an intermediate currency. The highlighted cells improved by routing through it.`;
+ const neg=fwState.some((row,i)=>row[i]<-1e-10);
+ $('fwStatus').textContent=neg?'Negative diagonal detected: a theoretical arbitrage cycle may exist. Check the route against fees and spreads.':fwStep===4?'Search complete. No negative cycle was found in these reference rates.':`Floyd–Warshall progress: ${fwStep} of 4 intermediate currencies checked.`;
+}
+function fwReset(){
+ if(fwTimer){clearInterval(fwTimer);fwTimer=null;$('fwAuto').textContent='Auto-play'}
+ fwState=fwInitial();fwStep=0;fwRender();
+}
+function fwNext(){
+ if(!fwState||fwStep>=CUR.length){if(fwTimer){clearInterval(fwTimer);fwTimer=null;$('fwAuto').textContent='Auto-play'}return}
+ const k=fwStep++,changed=[];
+ for(let i=0;i<CUR.length;i++)for(let j=0;j<CUR.length;j++){
+  const via=fwState[i][k]+fwState[k][j];
+  if(via<fwState[i][j]){fwState[i][j]=via;changed.push(i+','+j)}
+ }
+ fwRender(changed);
+ if(fwStep>=CUR.length&&fwTimer){clearInterval(fwTimer);fwTimer=null;$('fwAuto').textContent='Auto-play'}
+}
+$('fwNext').addEventListener('click',fwNext);
+$('fwAuto').addEventListener('click',()=>{
+ if(fwTimer){clearInterval(fwTimer);fwTimer=null;$('fwAuto').textContent='Auto-play';return}
+ if(fwStep>=CUR.length)fwReset();
+ $('fwAuto').textContent='Pause';fwTimer=setInterval(fwNext,1100);
+});
+$('fwReset').addEventListener('click',fwReset);
+
 render();loadRates();setInterval(loadRates,30000);
 </script>
 </body>
