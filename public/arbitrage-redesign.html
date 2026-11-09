@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arbitrage X · Spot the gap before it closes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f2ec;--ink:#0c2a21;--mut:#566860;--card:#fff;--line:rgba(12,42,33,.12);--fo:#0b2e24;--volt:#d6ff3d;--up:#1a7f4b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07140f;--ink:#eef3ea;--mut:#9db0a6;--card:#0f241c;--line:rgba(238,243,234,.14);--up:#9be37a}}
+:root[data-theme="dark"]{--bg:#07140f;--ink:#eef3ea;--mut:#9db0a6;--card:#0f241c;--line:rgba(238,243,234,.14);--up:#9be37a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Manrope,system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+a{color:inherit;text-decoration:none}
+.w{max-width:1120px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .w{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em;display:flex;gap:9px;align-items:center}
+.logo i{width:28px;height:28px;border-radius:9px;background:var(--fo);display:grid;place-items:center;color:var(--volt);font-style:normal;font-size:15px}
+nav{display:flex;gap:26px;align-items:center;font-weight:600;font-size:14px}
+nav a:not(.btn){color:var(--mut)}nav a:not(.btn):hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:99px;background:var(--volt);color:#0b2e24;font:800 15px Manrope,system-ui,sans-serif;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(214,255,61,.35)}
+.btn.o{background:transparent;color:inherit;border:1.5px solid rgba(238,243,234,.45)}
+.hero{background:var(--fo);color:#eef3ea;position:relative;overflow:hidden;border-radius:0 0 40px 40px}
+.hero::before{content:"";position:absolute;width:640px;height:640px;right:-140px;top:-100px;background:radial-gradient(circle,rgba(214,255,61,.26),transparent 65%);animation:glow 8s ease-in-out infinite alternate}
+@keyframes glow{to{transform:translate(-50px,70px) scale(1.15)}}
+.hero .w{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding-top:72px;padding-bottom:80px;position:relative}
+.tag{display:inline-flex;gap:8px;align-items:center;padding:6px 14px;border:1px solid rgba(238,243,234,.25);border-radius:99px;font-size:13px;font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--volt);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(214,255,61,.6)}100%{box-shadow:0 0 0 8px rgba(214,255,61,0)}}
+h1{font-size:clamp(42px,6.4vw,78px);line-height:1;letter-spacing:-.045em;font-weight:800;margin:22px 0}
+h1 em{font-style:normal;color:var(--volt)}
+.lead{font-size:18px;color:rgba(238,243,234,.75);max-width:470px}
+.cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.stage{position:relative;display:grid;place-items:center;perspective:1000px;min-height:560px}
+.phone{width:280px;border-radius:44px;padding:10px;background:#050d0a;box-shadow:0 40px 80px rgba(0,0,0,.4),inset 0 0 0 2px #22392f;transition:transform .25s;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{translate:0 -14px}}
+.scr{background:linear-gradient(#0f3a2f,#0a241d);border-radius:35px;padding:40px 16px 18px;color:#eef3ea;min-height:520px;position:relative;overflow:hidden}
+.scr::before{content:"";position:absolute;top:11px;left:50%;translate:-50% 0;width:84px;height:22px;border-radius:99px;background:#050d0a}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:800;color:var(--volt);background:rgba(214,255,61,.12);padding:4px 10px;border-radius:99px}
+.best{margin:16px 0 12px;padding:16px;border-radius:22px;background:var(--volt);color:#0b2e24}
+.best small{font-weight:600;opacity:.7;font-size:12px}
+.route{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin:8px 0 2px;font-weight:800;font-size:13px}
+.route span{background:rgba(11,46,36,.12);padding:3px 9px;border-radius:99px}
+.route b{opacity:.5}
+.gain{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.li{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;margin-bottom:8px;border-radius:16px;background:rgba(238,243,234,.07);font-size:12px;font-weight:700;animation:in .5s both}
+.li em{font-style:normal;color:var(--volt);font-size:14px}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.scan{height:4px;border-radius:9px;background:rgba(238,243,234,.12);margin-top:18px;overflow:hidden}
+.scan span{display:block;height:100%;width:40%;background:var(--volt);border-radius:9px;animation:sc 2s linear infinite}
+@keyframes sc{from{translate:-100%}to{translate:260%}}
+.scr .cap{margin-top:8px;font-size:11px;color:rgba(238,243,234,.55)}
+.chip{position:absolute;background:var(--card);color:var(--ink);font-weight:800;font-size:13px;padding:10px 16px;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.28);animation:float 5s ease-in-out infinite}
+.c1{left:-4px;top:90px}.c2{right:-4px;bottom:110px;animation-delay:-2s}
+.tick{overflow:hidden;border-bottom:1px solid var(--line);padding:16px 0;white-space:nowrap}
+.tick div{display:inline-flex;gap:44px;animation:mq 30s linear infinite;padding-left:44px;font-weight:700;font-size:14px;color:var(--mut)}
+.tick b{color:var(--ink)}
+@keyframes mq{to{transform:translateX(-50%)}}
+section{padding:92px 0}
+h2{font-size:clamp(32px,4.4vw,52px);line-height:1.05;letter-spacing:-.035em;font-weight:800;margin:0 0 14px}
+.sub{color:var(--mut);font-size:18px;max-width:540px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.stat,.step,.mk{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:26px;transition:transform .3s,box-shadow .3s}
+.stat:hover,.step:hover,.mk:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(12,42,33,.12)}
+.stat b{display:block;font-size:52px;letter-spacing:-.04em;line-height:1}
+.stat span{color:var(--mut);font-weight:600;font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.step i{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--fo);color:var(--volt);font:800 18px Manrope,system-ui,sans-serif}
+.step h3{margin:18px 0 6px;font-size:21px;letter-spacing:-.02em}.step p{margin:0;color:var(--mut)}
+.try{background:var(--fo);color:#eef3ea;border-radius:40px;margin:0 12px}
+.try .w{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.try .sub{color:rgba(238,243,234,.7)}
+.f label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin:12px 0 5px}
+.f input,.f select{width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(238,243,234,.18);background:rgba(238,243,234,.07);color:#eef3ea;font:700 16px Manrope,system-ui,sans-serif}
+.f select option{color:#0c2a21}
+.f .btn{width:100%;justify-content:center;margin-top:14px}
+#out{margin-top:14px;font-size:13px;min-height:110px}
+.mk{display:flex;flex-direction:column;gap:6px}
+.mk .sy{width:40px;height:40px;border-radius:50%;background:var(--volt);color:#0b2e24;display:grid;place-items:center;font-weight:800;font-size:18px}
+.mk strong{font-size:20px;margin-top:8px}.mk small{color:var(--mut);font-weight:600}.mk .market-rate{font-size:16px;font-weight:800;letter-spacing:-.02em;margin-top:8px}.mk .market-date{font-size:11px}
+.sp{fill:none;stroke:var(--up);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:400;stroke-dashoffset:400}
+.in .sp{animation:dr 1.8s .2s forwards}@keyframes dr{to{stroke-dashoffset:0}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:40px}
+.mk.soon{border-style:dashed;background:transparent;justify-content:center;align-items:center;text-align:center;color:var(--mut);font-weight:700}
+footer{background:var(--fo);color:rgba(238,243,234,.7);padding:48px 0 40px;font-size:14px;border-radius:40px 40px 0 0}
+footer .w{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer .logo{color:#eef3ea}footer p{max-width:420px;margin:10px 0 0}
+.js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s,transform .8s}.js .rv.in{opacity:1;transform:none}
+@media(max-width:860px){nav a:not(.btn){display:none}.hero .w,.try .w{grid-template-columns:1fr}.stats,.steps{grid-template-columns:1fr}.stage{min-height:0;padding-top:20px}.c1{left:0}.c2{right:0}section{padding:64px 0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<header><div class="w"><a class="logo" href="#top"><i>⚡</i>Arbitrage X</a>
+<nav><a href="#how">How it works</a><a href="#try">Try a route</a><a href="#markets">Markets</a><a class="btn" href="#try">Open the app</a></nav></div></header>
+
+<main id="top">
+<div class="hero"><div class="w">
+<div><span class="tag"><i class="dot"></i>Scanning the markets right now</span>
+<h1>Spot the gap.<br><em>Before it closes.</em></h1>
+<p class="lead">Arbitrage X watches currency rates around the clock and shows you the routes where the numbers don’t add up, so you can see an opportunity the moment it appears.</p>
+<div class="cta"><a class="btn" href="#try">Find my route →</a><a class="btn o" href="#how">See how it works</a></div></div>
+<div class="stage" id="stage"><div class="phone" id="ph"><div class="scr">
+<div class="row"><b>Opportunities</b><span class="pill"><i class="dot"></i>Live</span></div>
+<div class="best"><small>Best route right now</small><div class="route" id="hRoute"></div><div class="gain" id="hGain">+0.00%</div><small id="hSub"></small></div>
+<div id="hList"></div><div class="scan"><span></span></div><div class="cap">Refreshing every few seconds</div>
+</div></div><div class="chip c1" id="c1"></div><div class="chip c2" id="c2"></div></div>
+</div></div>
+
+<div class="tick"><div id="tk"></div></div>
+
+<section id="how"><div class="w">
+<h2 class="rv">Clear routes.<br>No guesswork.</h2><p class="sub rv">Everything you need to see a gap, in plain numbers.</p>
+<div class="stats rv"><div class="stat"><b data-n="0" id="s1">0</b><span>Currencies tracked</span></div><div class="stat"><b data-n="0" id="s2">0</b><span>Routes watched at once</span></div><div class="stat"><b>2s</b><span>Between refreshes</span></div></div>
+<div class="steps">
+<div class="step rv"><i>1</i><h3>We watch the rates</h3><p>Every pair is checked continuously, so nothing slips past while you’re away.</p></div>
+<div class="step rv"><i>2</i><h3>We find the gap</h3><p>When a round trip through a few currencies ends with more than you started, it appears instantly.</p></div>
+<div class="step rv"><i>3</i><h3>You follow the route</h3><p>See each step, each amount and your final result before you decide anything.</p></div>
+</div></div></section>
+
+<section class="try" id="try"><div class="w">
+<div class="rv"><h2>Try a route.</h2><p class="sub">Pick a starting currency and an amount. We’ll show the best round trip available at this moment, step by step.</p></div>
+<div class="stage rv" style="min-height:0"><div class="phone" style="animation-delay:-3s"><div class="scr f">
+<div class="row"><b>Find my route</b><span class="pill">Sample rates</span></div>
+<label for="amt">Amount</label><input id="amt" type="number" value="1000" min="1" inputmode="decimal">
+<label for="st">Start with</label><select id="st"></select>
+<button class="btn" id="go" type="button">Show best route</button>
+<div id="out"></div></div></div></div>
+</div></section>
+
+<section id="markets"><div class="w">
+<h2 class="rv">Markets.</h2><p class="sub rv">Four currencies today, built to welcome many more.</p>
+<div class="grid" id="mg"></div></div></section>
+</main>
+
+<footer><div class="w"><div><a class="logo" href="#top"><i>⚡</i>Arbitrage X</a><p>A student project exploring currency opportunities. Rates shown are samples for demonstration. Nothing here is financial advice.</p></div><div>© 2026 Arbitrage X</div></div></footer>
+
+<script>
+document.documentElement.classList.add('js');
+const CUR=[{c:'USD',n:'US Dollar',s:'$',l:'en-US'},{c:'EUR',n:'Euro',s:'€',l:'de-DE'},{c:'INR',n:'Indian Rupee',s:'₹',l:'en-IN'},{c:'GBP',n:'British Pound',s:'£',l:'en-GB'}];
+const N=CUR.length;
+let liveRates=new Map(),ratesLoaded=false,rateDate='';
+const rate=(i,j)=>liveRates.get(`${CUR[i].c}-${CUR[j].c}`) ?? NaN;
+const money=(i,x)=>new Intl.NumberFormat(CUR[i].l,{style:'currency',currency:CUR[i].c}).format(x);
+const pct=g=>(g>=0?'+':'')+(g*100).toFixed(2)+'%';
+function loops(s){const o=[];for(let a=0;a<N;a++)for(let b=0;b<N;b++)for(let c=0;c<N;c++){
+ if(a==b||b==c||a==c)continue;if(s==null?(a>b||a>c):a!==s)continue;
+ const g=rate(a,b)*rate(b,c)*rate(c,a)-1;
+ if(Number.isFinite(g))o.push({p:[a,b,c,a],g})}
+ return o.sort((x,y)=>y.g-x.g)}
+const chips=p=>p.map(i=>`<span>${CUR[i].c}</span>`).join('<b>→</b>');
+const $=id=>document.getElementById(id);
+function render(){
+ if(!ratesLoaded){$('hRoute').textContent='Loading rates…';$('hGain').textContent='—';$('hSub').textContent='Connecting to Frankfurter daily rates';$('hList').innerHTML='';$('c1').textContent='Rates loading…';$('c2').textContent='Rates loading…';document.querySelectorAll('[data-r]').forEach(e=>e.textContent='—');document.querySelectorAll('[data-market-value]').forEach(e=>e.textContent='Rate unavailable');document.querySelectorAll('[data-market-date]').forEach(e=>e.textContent='Waiting for daily rates');return}
+ const L=loops(null).filter(x=>x.g>.0005),b=L[0];
+ if(b){$('hRoute').innerHTML=chips(b.p);$('hGain').textContent=pct(b.g);$('hSub').textContent='1,000 '+CUR[b.p[0]].c+' becomes '+money(b.p[0],1000*(1+b.g))}
+ else{$('hRoute').textContent='Scanning…';$('hGain').textContent='—';$('hSub').textContent='No positive cycle in the published reference rates'}
+ $('hList').innerHTML=L.slice(1,3).map(x=>`<div class="li"><span>${x.p.slice(0,3).map(i=>CUR[i].c).join(' → ')}</span><em>${pct(x.g)}</em></div>`).join('');
+ $('c1').textContent=`${CUR[0].c} → ${CUR[1].c}  ${rate(0,1).toFixed(4)}`;
+ $('c2').textContent=`${CUR[3].c} → ${CUR[0].c}  ${rate(3,0).toFixed(4)}`;
+ document.querySelectorAll('[data-r]').forEach(e=>{const[i,j]=e.dataset.r.split(',');e.textContent=rate(+i,+j).toFixed(4)});
+ document.querySelectorAll('[data-market-value]').forEach(e=>{const i=CUR.findIndex(c=>c.c===e.dataset.marketValue);e.textContent=`1 USD = ${rate(0,i).toLocaleString('en-US',{maximumFractionDigits:4,minimumFractionDigits: i===2?3:4})} ${CUR[i].c}`});
+ document.querySelectorAll('[data-market-date]').forEach(e=>e.textContent=`Daily reference · ${rateDate}`);
+}
+async function loadRates(){
+ try{
+  const response=await fetch('/api/rates',{cache:'no-store'});
+  if(!response.ok)throw new Error(`Rates request failed (${response.status})`);
+  const data=await response.json();
+  if(!Array.isArray(data.rates))throw new Error('Rates response is missing the rates list');
+  const nextRates=new Map(data.rates.map(r=>[`${r.from}-${r.to}`,Number(r.rate)]).filter(([,v])=>Number.isFinite(v)&&v>0));
+  if(CUR.some(a=>CUR.some(b=>a!==b&&!nextRates.has(`${a.c}-${b.c}`))))throw new Error('Frankfurter did not return every currency pair');
+  liveRates=nextRates;rateDate=data.rateDate||'';ratesLoaded=true;
+ }catch(error){console.error('Unable to load Frankfurter rates:',error);if(!ratesLoaded){$('hSub').textContent='Daily rates are temporarily unavailable';$('mg').querySelectorAll('[data-market-value]').forEach(e=>e.textContent='Rate unavailable')}}
+ render();
+}
+const pairs=[[0,1],[1,0],[0,2],[2,0],[1,2],[3,0],[3,2],[1,3]];
+const tk=pairs.map(([i,j])=>`<span>${CUR[i].c}/${CUR[j].c} <b data-r="${i},${j}"></b></span>`).join('');
+$('tk').innerHTML=tk+tk;
+$('st').innerHTML=CUR.map((c,i)=>`<option value="${i}">${c.c} · ${c.n}</option>`).join('');
+$('mg').innerHTML=CUR.map(c=>{let y=20,pts=[];for(let k=0;k<8;k++){y=Math.max(6,Math.min(30,y+(Math.random()-.55)*12));pts.push(`${k*17},${y.toFixed(1)}`)}return `<div class="mk rv"><div class="sy">${c.s}</div><strong>${c.c}</strong><small>${c.n}</small><div class="market-rate" data-market-value="${c.c}">Loading rate…</div><small class="market-date" data-market-date>Loading daily reference…</small><svg viewBox="0 0 120 36" width="100%" height="48"><polyline class="sp" points="${pts.join(' ')}"/></svg></div>`}).join('')+'<div class="mk soon rv">More currencies<br>coming soon</div>';
+$('go').onclick=()=>{
+ const s=+$('st').value,amt=Math.max(1,+$('amt').value||0),b=loops(s)[0];let a=amt,h='';
+ if(!ratesLoaded||!b){$('out').innerHTML='<div class="cap" style="margin-top:10px">Daily reference rates are not available yet. Please try again shortly.</div>';return}
+ for(let k=0;k<3;k++){const f=b.p[k],t=b.p[k+1],n=a*rate(f,t);
+  h+=`<div class="li" style="animation-delay:${k*.25}s"><span>${money(f,a)} → ${CUR[t].c}</span><em>${money(t,n)}</em></div>`;a=n}
+ h+=b.g>0?`<div class="best" style="animation:in .5s .8s both"><small>You end with</small><div class="gain" style="font-size:28px">${money(s,a)}</div><small>${pct(b.g)} on this round trip</small></div>`
+ :`<div class="cap" style="margin-top:10px;opacity:.7">No gain from this start right now. Rates move quickly, so try again in a moment.</div>`;
+ $('out').innerHTML=h};
+// count-up stats and scroll reveal
+$('s1').dataset.n=N;$('s2').dataset.n=loops(null).length;
+const up=e=>{const n=+e.dataset.n,t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/900);e.textContent=Math.round(n*k);if(k<1)requestAnimationFrame(f)})(t0)};
+if('IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');x.target.querySelectorAll('[data-n]').forEach(up);io.unobserve(x.target)}}),{threshold:.2});
+ document.querySelectorAll('.rv').forEach(e=>io.observe(e))}else{document.querySelectorAll('.rv').forEach(e=>e.classList.add('in'));document.querySelectorAll('[data-n]').forEach(up)}
+// phone follows the pointer
+const stg=$('stage'),ph=$('ph');
+stg.addEventListener('pointermove',e=>{const r=stg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;ph.style.transform=`rotateY(${x*18}deg) rotateX(${-y*12}deg)`});
+stg.addEventListener('pointerleave',()=>ph.style.transform='');
+render();loadRates();setInterval(loadRates,30000);
+</script>
+</body>
+</html>
