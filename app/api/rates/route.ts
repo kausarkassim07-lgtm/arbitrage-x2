@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 const currencies = ["USD", "EUR", "GBP", "INR"];
 
@@ -20,10 +19,8 @@ export async function GET() {
     url.searchParams.set("base", "EUR");
     url.searchParams.set("quotes", "USD,GBP,INR");
 
-    // Always ask Frankfurter for its newest published daily snapshot.
-    // Frankfurter itself only updates when new reference rates are published.
     const response = await fetch(url.toString(), {
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
@@ -70,10 +67,6 @@ export async function GET() {
       rateDate,
       pairCount: rates.length / 2,
       dataType: "Daily reference rates",
-    }, {
-      headers: {
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-      },
     });
   } catch (error) {
     return NextResponse.json(
