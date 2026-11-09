@@ -99,7 +99,7 @@ footer .logo{color:#eef3ea}footer p{max-width:420px;margin:10px 0 0}
 </head>
 <body>
 <header><div class="w"><a class="logo" href="#top"><i>⚡</i>Arbitrage X</a>
-<nav><a href="#how">How it works</a><a href="#try">Try a route</a><a href="#markets">Markets</a><a class="btn" href="#try">Open the app</a></nav></div></header>
+<nav><a href="#how">How it works</a><a href="#try">Try a route</a><a href="#markets">Markets</a></nav></div></header>
 
 <main id="top">
 <div class="hero"><div class="w">
@@ -123,6 +123,16 @@ footer .logo{color:#eef3ea}footer p{max-width:420px;margin:10px 0 0}
 <div class="step rv"><i>1</i><h3>We watch the rates</h3><p>Every pair is checked continuously, so nothing slips past while you’re away.</p></div>
 <div class="step rv"><i>2</i><h3>We find the gap</h3><p>When a round trip through a few currencies ends with more than you started, it appears instantly.</p></div>
 <div class="step rv"><i>3</i><h3>You follow the route</h3><p>See each step, each amount and your final result before you decide anything.</p></div>
+</div>
+<div class="algorithm rv">
+<h2>Inside the algorithm.</h2>
+<p class="sub">Arbitrage X uses the Floyd–Warshall algorithm to analyse exchange-rate paths and detect potential currency loops.</p>
+<div class="steps">
+<div class="step"><i>1</i><h3>Build the currency graph</h3><p>Each currency is a node. An exchange rate from one currency to another becomes a directed edge, weighted using the negative logarithm: −ln(rate).</p></div>
+<div class="step"><i>2</i><h3>Compare every path</h3><p>Floyd–Warshall checks paths through every intermediate currency and keeps the lowest-cost route between each pair.</p></div>
+<div class="step"><i>3</i><h3>Detect a negative cycle</h3><p>If a diagonal distance becomes negative, a cycle may produce more currency than it started with. The route is then checked by multiplying its exchange rates.</p></div>
+</div>
+<p class="sub" style="margin-top:22px;font-size:14px">A detected cycle is only a theoretical opportunity based on reference rates. Real execution can be affected by fees, spreads, slippage and rate delays.</p>
 </div></div></section>
 
 <section class="try" id="try"><div class="w">
